@@ -54,7 +54,7 @@ void	print_operator(t_token_type type)
 		printf("Operador: PAREN CLOSE )\n");
 }
 
-void	test_commands_from_tokens(t_token_list *tokens)
+void	test_commands_from_tokens(t_token_list *tokens, t_env *env)
 {
 	t_token		*current;
 	t_command	*cmd;
@@ -71,7 +71,7 @@ void	test_commands_from_tokens(t_token_list *tokens)
 		}
 		else
 		{
-			cmd = make_command(&current);
+			cmd = make_command(&current, env);
 			if (!cmd)
 			{
 				printf("Erro ao criar comando\n");

@@ -5,89 +5,49 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: marcudos <marcudos@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/24 11:43:01 by marcudos          #+#    #+#             */
-/*   Updated: 2025/04/28 17:52:00 by marcudos         ###   ########.fr       */
+/*   Created: 2025/05/14 15:15:50 by marcudos          #+#    #+#             */
+/*   Updated: 2025/05/14 15:37:01 by marcudos         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void	expander(char	***args, t_env *env)
-{
-	char	*expanded;
-	char	*temp;
-	int		i;
+t_args	*create_arg_list(char **args);
 
-	i = 0;
-	while ((*args)[i])
+void	expand(char **args)
+{
+	char	**new_args;
+	t_args	*head;
+
+	head = create_arg_list(args); 
+}
+
+t_args	*create_arg_list(char **args)
+{
+	t_args	*head;
+	t_args	*arg;
+	t_args	*new;
+	int	i;
+
+	if (!args || !args[0])
+		return (NULL);
+	head = (t_args *) malloc(sizeof(t_args));
+	if (!head)
+		return (NULL);
+	head->arg = ft_strdup(args[0]);
+	head->next = NULL;
+	arg = head;
+	i = 1;
+	while (args[i])
 	{
-		expanded = expander_expand((*args)[i], env);
-		temp = (*args)[i];
-		(*args)[i] = expanded;
-		free(temp);
+		new = (t_args *) malloc(sizeof(t_args));
+		if (!new)
+			return (free_arg_list(head), NULL);
+		new->arg = ft_strdup(args[i]);
+		new->next = NULL;
+		arg->next = new;
+		arg = arg->next;
 		i++;
 	}
-}
-
-char	*expand_next_token(char *input, t_env *env, t_quote *state, int *i)
-{
-	char	*expanded;
-
-	update_state_quote(input, state, i);
-	if (input[*i] == '$' || input[*i] == '~')
-	{
-		expanded = expand_token(&input[*i], env, *state);
-		(*i) += get_expand_len(&input[*i], *state);
-		return (expanded);
-	}
-	else
-	{
-		expanded = ft_substr(input, *i, 1);
-		(*i)++;
-		return (expanded);
-	}
-}
-
-char	*expander_expand(char *input, t_env *env)
-{
-	char	*res;
-	char	*temp;
-	char	*next;
-	t_quote	state;
-	int		i;
-
-	if (!input)
-		return (NULL);
-	i = 0;
-	state = NO_QUOTE;
-	res = NULL;
-	while (input[i])
-	{
-		next = expand_next_token(input, env, &state, &i);
-		if (!res)
-			res = ft_strdup(next);
-		else
-		{
-			temp = res;
-			res = ft_strjoin(temp, next);
-			free(temp);
-		}
-		free(next);
-	}
-	return (res);
-}
-
-char	*expand_token(char *input, t_env *env, t_quote state)
-{
-	if (state != SINGLE_QUOTE)
-	{
-		if (input[0] == '$')
-		{
-			if (input[1] != ' ')
-				return (expand_env(extract_key(&input[1]), env));
-			else
-				return (ft_strdup("$"));
-		}
-	}
-	return (ft_substr(input, 0, 1));
+	return (head);
 }

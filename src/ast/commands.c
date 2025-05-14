@@ -12,7 +12,7 @@
 
 #include "../../include/minishell.h"
 
-t_command	*make_command(t_token **token)
+t_command	*make_command(t_token **token, t_env *env)
 {
 	t_command	*command;
 	t_token		*t;
@@ -38,6 +38,7 @@ t_command	*make_command(t_token **token)
 			parse_redirect(&t, &command);
 	}
 	command->args[arg] = NULL;
+	expander(&command->args, env);
 	return ((*token) = t, command);
 }
 
